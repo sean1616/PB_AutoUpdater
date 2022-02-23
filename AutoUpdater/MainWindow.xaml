@@ -1,0 +1,319 @@
+﻿<Window x:Class="AutoUpdater.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:AutoUpdater"
+        mc:Ignorable="d"
+        WindowStyle="None"
+        Title="AutoUpdater"
+        Height="450"
+        Width="800">
+    
+    
+    
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="40"/>
+            <ColumnDefinition Width="3*" />
+            <ColumnDefinition Width="9*"/>
+            <ColumnDefinition Width="40" />
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="40"/>
+            <RowDefinition Height="8*" />
+            <RowDefinition Height="20" />
+        </Grid.RowDefinitions>
+        <Border Name="border_title"
+                Grid.Column="0"
+                Grid.ColumnSpan="4"
+                Background="#FF646464"
+                MouseLeftButtonUp="border_title_MouseLeftButtonUp"
+                MouseMove="border_title_MouseMove"
+                PreviewMouseLeftButtonDown="border_title_PreviewMouseLeftButtonDown" />
+        <Grid Grid.ColumnSpan="2">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="10"/>
+                <ColumnDefinition />
+            </Grid.ColumnDefinitions>
+            <TextBlock FontFamily="Segoe Print" Text="PB Version"
+                       HorizontalAlignment="Left"
+                       VerticalAlignment="Center"
+                       Foreground="Wheat"
+                       Grid.Column="1" />
+        </Grid>
+        <Grid Grid.Column="2"
+              Grid.ColumnSpan="2">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition />
+                <ColumnDefinition Width="45"/>
+                <ColumnDefinition Width="10"/>
+                <ColumnDefinition Width="25"/>
+                <ColumnDefinition Width="10"/>
+                <ColumnDefinition Width="25"/>
+                <ColumnDefinition Width="10"/>
+            </Grid.ColumnDefinitions>
+
+            <ToggleButton Name="ToggleBtn_Auto_Update"
+                          Grid.Column="1"
+                          Grid.Row="1"
+                          HorizontalAlignment="Right"
+                          MaxWidth="50"
+                          MinWidth="40"
+                          MaxHeight="25"
+                          ToolTip="Auto Update"
+                          Click="ToggleBtn_Auto_Update_Click"
+                          IsChecked="{Binding isDACorVolt, Mode=TwoWay}"
+                          Style="{StaticResource SwitchTypeToggleButton_In_SettingPage}">
+                <ToggleButton.Background>
+                    <LinearGradientBrush StartPoint="0,0"
+                                         EndPoint="0,1">
+                        <GradientStop Offset="0"
+                                      Color="#FFF3F3F3" />
+                        <GradientStop Offset="0.5"
+                                      Color="#FFEBEBEB" />
+                        <GradientStop Offset="0.5"
+                                      Color="#FFDDDDDD" />
+                        <GradientStop Offset="1"
+                                      Color="#FF33D3C4" />
+                    </LinearGradientBrush>
+                </ToggleButton.Background>
+            </ToggleButton>
+
+            <Button Name="btn_min"
+                    MaxHeight="25"
+                    MinHeight="25"
+                    MinWidth="25"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    Click="btn_min_Click"
+                    Style="{DynamicResource style_WindowFuncBtn}"
+                    Tag="../Resources/Min_white.png"
+                    Grid.Column="3" />
+
+            <Button Name="btn_close"
+                    Grid.Column="5"
+                    MaxHeight="25"
+                    MinHeight="25" 
+                    MinWidth="25"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    Click="btn_close_Click"
+                    Style="{DynamicResource style_WindowFuncBtn}"
+                    Tag="../Resources/close.png" />
+        </Grid>
+
+        <Grid Grid.Row="1"
+              Grid.Column="1">
+            <Image x:Name="image"
+                   Margin="5"
+                   Grid.Row="0"
+                   Grid.RowSpan="3"
+                   Grid.Column="1"
+                   Visibility="Visible"
+                   Source="Resources/polar-bear.png" />
+        </Grid>
+
+        <Grid Grid.Row="1"
+              Grid.Column="2">
+            <Grid.RowDefinitions>
+                <RowDefinition />
+                <RowDefinition />
+                <RowDefinition />
+                <RowDefinition />
+                <RowDefinition />
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition />
+                <ColumnDefinition />
+            </Grid.ColumnDefinitions>
+
+            <StackPanel Orientation="Horizontal"
+                        Grid.ColumnSpan="2"
+                        HorizontalAlignment="Center">
+            <TextBox x:Name="txt_server_path"
+                     HorizontalAlignment="Center"
+                     Height="35"
+                     FontFamily="Segoe Print"
+                     VerticalContentAlignment="Center"
+                     Text="\\192.168.2.3\shared\SeanWu\PB\"
+                     VerticalAlignment="Center"
+                     Width="430"
+                     Grid.ColumnSpan="2" />
+                <Button Name="btn_open_server" Width="35" Height="35"
+                        VerticalAlignment="Center"
+                        ToolTip="Open Server Folder"
+                        HorizontalAlignment="Center" Click="btn_open_server_Click"/>
+            </StackPanel>
+
+            <StackPanel Orientation="Horizontal"
+                        Grid.Row="1"
+                        Grid.ColumnSpan="2"
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Center">
+                <Label 
+                       Height="35"
+                       FontSize="14"
+                       Content="Server :"
+                       FontFamily="Segoe Print"
+                       VerticalContentAlignment="Center"
+                       Width="79"
+                       Grid.Column="1" />
+                <TextBox x:Name="txt_new_version"
+                         HorizontalAlignment="Left"
+                         Height="35" 
+                         TextWrapping="Wrap"
+                         FontFamily="Segoe Print"
+                         VerticalContentAlignment="Center"
+                         Text=""
+                         VerticalAlignment="Top"
+                         Width="383"
+                         Grid.Column="1"
+                         Visibility="Collapsed"
+                         />
+                <ComboBox Name="combox_latest_version"
+                          Width="383"
+                          FontFamily="Segoe Print"
+                          
+                          VerticalContentAlignment="Center"
+                          HorizontalContentAlignment="Center" DropDownOpened="combox_latest_version_DropDownOpened"/>
+            </StackPanel>
+
+            <StackPanel Orientation="Horizontal"
+                        Grid.Row="2"
+                        Grid.ColumnSpan="2"
+                        HorizontalAlignment="Center">
+            <TextBox x:Name="txt_local_path"
+                     HorizontalAlignment="Center"
+                     Height="35"
+                     FontFamily="Segoe Print"
+                     VerticalContentAlignment="Center"
+                     Text="\\192.168.2.3\shared\SeanWu\PB\"
+                     VerticalAlignment="Center"
+                     Width="430"
+                     Grid.ColumnSpan="2"
+                     Grid.Row="2" />
+                <Button Name="btn_open_local"
+                        Width="35"
+                        Height="35"
+                        ToolTip="Open Local Folder"
+                        VerticalAlignment="Center"
+                        HorizontalAlignment="Center" Click="btn_open_local_Click"/>
+            </StackPanel>
+
+            <StackPanel Grid.Row="3" Orientation="Horizontal"
+                        Grid.ColumnSpan="2"
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Center">
+                <Label HorizontalAlignment="Left"
+                       Height="35"
+                       FontSize="14"
+                       Content="Now :"
+                       FontFamily="Segoe Print"
+                       VerticalContentAlignment="Center"
+                       Width="75" />
+
+                <TextBox x:Name="txt_now_version"
+                         HorizontalAlignment="Center"
+                         Height="35"
+                         TextWrapping="Wrap"
+                         FontFamily="Segoe Print"
+                         VerticalContentAlignment="Center"
+                         Text=""
+                         VerticalAlignment="Top"
+                         Visibility="Collapsed"
+                         Width="388" />
+                <ComboBox Name="combox_now_version"
+                          Width="383"
+                          FontFamily="Segoe Print"
+                          VerticalContentAlignment="Center"
+                          HorizontalContentAlignment="Center" DropDownOpened="combox_now_version_DropDownOpened"/>
+
+            </StackPanel>
+
+            <Button x:Name="btn_update"
+                    Content="Update"
+                    Click="btn_update_Click"
+                    Width="180"
+                    Style="{DynamicResource style_FuncBtn}"
+                    Grid.Row="4" />
+            <Button x:Name="btn_Open"
+                    Content="Go"
+                    Width="180"
+                    Click="btn_Open_Click"
+                    Style="{DynamicResource style_FuncBtn}"
+                    Grid.Row="4"
+                    Grid.Column="1" />
+        </Grid>
+        <!--<Grid Grid.Row="1"
+              Grid.Column="2">
+            <Grid.RowDefinitions>
+                <RowDefinition />
+                <RowDefinition />
+                <RowDefinition />
+                <RowDefinition />
+                <RowDefinition />
+            </Grid.RowDefinitions>
+            --><!--<Button x:Name="btn_checkVersion"
+                    Content="Check Version"
+                    Click="btn_checkVersion_Click"
+                    Style="{DynamicResource style_FuncBtn}" />-->
+            <!--<Button x:Name="btn_checkAllVersion"
+                    Content="All Versions"
+                    Click="btn_checkAllVersion_Click"
+                    Grid.Row="1"
+                    Style="{DynamicResource style_FuncBtn}" />--><!--
+         
+        </Grid>-->
+
+        <Grid Grid.Row="1"
+              Grid.Column="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition />
+                <ColumnDefinition />
+            </Grid.ColumnDefinitions>
+            
+
+          
+           
+
+            <!--<ScrollViewer Grid.Column="1"
+                          Margin="10,90,10,10">
+                <TextBlock x:Name="txt_server_all_version"
+                           HorizontalAlignment="Left"
+                           FontFamily="Segoe Print"
+                           TextWrapping="Wrap"
+                           Text=""
+                           ScrollViewer.CanContentScroll="True"
+                           VerticalAlignment="Top" />
+            </ScrollViewer>-->
+            
+            <!--<ScrollViewer Margin="10,90,10,10">
+                <TextBlock x:Name="txt_local_all_version"
+                           HorizontalAlignment="Left"
+                           FontFamily="Segoe Print"
+                           TextWrapping="Wrap"
+                           Text=""
+                           ScrollViewer.CanContentScroll="True"
+                           VerticalAlignment="Top" />
+            </ScrollViewer>-->
+
+            
+        </Grid>
+
+        <Grid Grid.Row="2"
+              Grid.Column="1"
+              Grid.ColumnSpan="2">
+            <Label x:Name="label_msg"
+                   HorizontalAlignment="Left"
+                   Height="35"
+                   Visibility="Hidden"
+                   FontSize="14"
+                   Content="- - -"
+                   FontFamily="Segoe Print"
+                   VerticalContentAlignment="Center"
+                   Margin="10,10,0,7"
+                   VerticalAlignment="Center" />
+        </Grid>
+    </Grid>
+</Window>
