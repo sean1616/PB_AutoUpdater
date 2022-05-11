@@ -12,7 +12,7 @@ namespace AutoUpdater
     {
         public static SetupIniIP ini = new SetupIniIP();
 
-        string ini_path = @"D:\PD\Instrument.ini";
+        public string ini_path = @"D:\PD\Instrument.ini";
         public string allfiles = "";
 
         List<string> list_all_version = new List<string>();
@@ -208,7 +208,7 @@ namespace AutoUpdater
             return true;
         }
 
-        public string Get_Latest_Version_File(List<string> list_all_path, string latest_version, string path_now)
+        public string Get_Latest_Version_File(List<string> list_all_path, string latest_version, string path_now, string path_latest_ver_file)
         {
             string targetExe = "";
             //string updateFile = "";
@@ -229,7 +229,8 @@ namespace AutoUpdater
                     //Copy the latest file
                     try
                     {
-                        File.Copy(sss, Path.Combine(path_now, targetFileName), true);
+                        string pn = Path.Combine(path_now, targetFileName);
+                        File.Copy(Path.Combine(path_latest_ver_file, targetFileName), path_now, true);
                     }
                     catch (Exception e)
                     {

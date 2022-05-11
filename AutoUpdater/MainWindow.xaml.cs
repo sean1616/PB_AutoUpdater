@@ -109,6 +109,23 @@ namespace AutoUpdater
             combox_latest_version.Items.Clear();
             all_version_for_show.Clear();
             dic_server_version.Clear();
+
+            if (!Directory.Exists(auto_update_path))
+            {
+                string msg = string.Concat
+                    ("Auto-Update folder is not exist",
+                     "\r\n",
+                     auto_update_path,
+                     "\r\n\r\n",
+                     "Please check ini setting",
+                     "\r\n",
+                      fnc.ini_path
+                    );
+                MessageBox.Show(msg);
+
+                return;
+            }
+
             string[] ss = Directory.GetDirectories(auto_update_path, "v*");
             for (int i = 0; i < ss.Length; i++)
             {
@@ -204,7 +221,9 @@ namespace AutoUpdater
             if (_isAutoUpdate)
             {
                 #region Get_Latest_Version
-                targetExe = fnc.Get_Latest_Version_File(list_all_path, target_version, path_now);
+                string server_path = dic_server_version[combox_latest_version.SelectedItem.ToString()];
+                fnc.Get_Files_from_Server(server_path, txt_local_path.Text);
+                targetExe = fnc.Get_Latest_Version_File(list_all_path, target_version, path_now, server_path);
                 #endregion
 
                 #region Open Latest Version
@@ -364,9 +383,9 @@ namespace AutoUpdater
                 if (combox_now_version.Items.Contains(txt_now_version.Text)) combox_now_version.SelectedItem = txt_now_version.Text;
                 #endregion
 
-                MessageBox.Show("Update Finished");
+                MessageBox.Show("Updated");
             }
-            
+
             #endregion
         }
 
