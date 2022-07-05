@@ -9,18 +9,132 @@
         Title="AutoUpdater"
         Height="450"
         Width="800">
-    
-    
-    
+    <Window.Resources>
+        <Style x:Key="FocusVisual">
+            <Setter Property="Control.Template">
+                <Setter.Value>
+                    <ControlTemplate>
+                        <Rectangle Margin="2"
+                                   SnapsToDevicePixels="true"
+                                   Stroke="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}"
+                                   StrokeThickness="1"
+                                   StrokeDashArray="1 2" />
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <SolidColorBrush x:Key="Button.Static.Background"
+                         Color="#FFDDDDDD" />
+        <SolidColorBrush x:Key="Button.Static.Border"
+                         Color="#FF707070" />
+        <SolidColorBrush x:Key="Button.MouseOver.Background"
+                         Color="#FFBEE6FD" />
+        <SolidColorBrush x:Key="Button.MouseOver.Border"
+                         Color="#FF3C7FB1" />
+        <SolidColorBrush x:Key="Button.Pressed.Background"
+                         Color="#FFC4E5F6" />
+        <SolidColorBrush x:Key="Button.Pressed.Border"
+                         Color="#FF2C628B" />
+        <SolidColorBrush x:Key="Button.Disabled.Background"
+                         Color="#FFF4F4F4" />
+        <SolidColorBrush x:Key="Button.Disabled.Border"
+                         Color="#FFADB2B5" />
+        <SolidColorBrush x:Key="Button.Disabled.Foreground"
+                         Color="#FF838383" />
+        <Style x:Key="ButtonStyle1"
+               TargetType="{x:Type Button}">
+            <Setter Property="FocusVisualStyle"
+                    Value="{StaticResource FocusVisual}" />
+            <Setter Property="Background"
+                    Value="{StaticResource Button.Static.Background}" />
+            <Setter Property="BorderBrush"
+                    Value="{StaticResource Button.Static.Border}" />
+            <Setter Property="Foreground"
+                    Value="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}" />
+            <Setter Property="BorderThickness"
+                    Value="1" />
+            <Setter Property="HorizontalContentAlignment"
+                    Value="Center" />
+            <Setter Property="VerticalContentAlignment"
+                    Value="Center" />
+            <Setter Property="Padding"
+                    Value="1" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type Button}">
+                        <Border x:Name="border"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                Background="{TemplateBinding Background}"
+                                SnapsToDevicePixels="true">
+                            <Grid>
+                                <Image HorizontalAlignment="Center" Margin="9"
+                                       Source="{Binding Content.Source, RelativeSource={RelativeSource TemplatedParent}}" />
+                                <ContentPresenter x:Name="contentPresenter"
+                                              Focusable="False"
+                                              HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                              Margin="{TemplateBinding Padding}"
+                                              RecognizesAccessKey="True"
+                                              SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"
+                                              VerticalAlignment="{TemplateBinding VerticalContentAlignment}" />
+                            </Grid>
+                           
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsDefaulted"
+                                     Value="true">
+                                <Setter Property="BorderBrush"
+                                        TargetName="border"
+                                        Value="{DynamicResource {x:Static SystemColors.HighlightBrushKey}}" />
+                            </Trigger>
+                            <Trigger Property="IsMouseOver"
+                                     Value="true">
+                                <Setter Property="Background"
+                                        TargetName="border"
+                                        Value="{StaticResource Button.MouseOver.Background}" />
+                                <Setter Property="BorderBrush"
+                                        TargetName="border"
+                                        Value="{StaticResource Button.MouseOver.Border}" />
+                            </Trigger>
+                            <Trigger Property="IsPressed"
+                                     Value="true">
+                                <Setter Property="Background"
+                                        TargetName="border"
+                                        Value="{StaticResource Button.Pressed.Background}" />
+                                <Setter Property="BorderBrush"
+                                        TargetName="border"
+                                        Value="{StaticResource Button.Pressed.Border}" />
+                            </Trigger>
+                            <Trigger Property="IsEnabled"
+                                     Value="false">
+                                <Setter Property="Background"
+                                        TargetName="border"
+                                        Value="{StaticResource Button.Disabled.Background}" />
+                                <Setter Property="BorderBrush"
+                                        TargetName="border"
+                                        Value="{StaticResource Button.Disabled.Border}" />
+                                <Setter Property="TextElement.Foreground"
+                                        TargetName="contentPresenter"
+                                        Value="{StaticResource Button.Disabled.Foreground}" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Window.Resources>
+
+
+
     <Grid>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="40"/>
+            <ColumnDefinition Width="40" />
             <ColumnDefinition Width="3*" />
-            <ColumnDefinition Width="9*"/>
+            <ColumnDefinition Width="9*" />
             <ColumnDefinition Width="40" />
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
-            <RowDefinition Height="40"/>
+            <RowDefinition Height="40" />
             <RowDefinition Height="8*" />
             <RowDefinition Height="20" />
         </Grid.RowDefinitions>
@@ -33,10 +147,11 @@
                 PreviewMouseLeftButtonDown="border_title_PreviewMouseLeftButtonDown" />
         <Grid Grid.ColumnSpan="2">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="10"/>
+                <ColumnDefinition Width="10" />
                 <ColumnDefinition />
             </Grid.ColumnDefinitions>
-            <TextBlock FontFamily="Segoe Print" Text="PB Version"
+            <TextBlock FontFamily="Segoe Print"
+                       Text="PB Version"
                        HorizontalAlignment="Left"
                        VerticalAlignment="Center"
                        Foreground="Wheat"
@@ -46,12 +161,12 @@
               Grid.ColumnSpan="2">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition />
-                <ColumnDefinition Width="45"/>
-                <ColumnDefinition Width="10"/>
-                <ColumnDefinition Width="25"/>
-                <ColumnDefinition Width="10"/>
-                <ColumnDefinition Width="25"/>
-                <ColumnDefinition Width="10"/>
+                <ColumnDefinition Width="45" />
+                <ColumnDefinition Width="10" />
+                <ColumnDefinition Width="25" />
+                <ColumnDefinition Width="10" />
+                <ColumnDefinition Width="25" />
+                <ColumnDefinition Width="10" />
             </Grid.ColumnDefinitions>
 
             <ToggleButton Name="ToggleBtn_Auto_Update"
@@ -94,7 +209,7 @@
             <Button Name="btn_close"
                     Grid.Column="5"
                     MaxHeight="25"
-                    MinHeight="25" 
+                    MinHeight="25"
                     MinWidth="25"
                     HorizontalAlignment="Center"
                     VerticalAlignment="Center"
@@ -131,19 +246,27 @@
             <StackPanel Orientation="Horizontal"
                         Grid.ColumnSpan="2"
                         HorizontalAlignment="Center">
-            <TextBox x:Name="txt_server_path"
-                     HorizontalAlignment="Center"
-                     Height="35"
-                     FontFamily="Segoe Print"
-                     VerticalContentAlignment="Center"
-                     Text="\\192.168.2.3\shared\SeanWu\PB\"
-                     VerticalAlignment="Center"
-                     Width="430"
-                     Grid.ColumnSpan="2" />
-                <Button Name="btn_open_server" Width="35" Height="35"
+                <TextBox x:Name="txt_server_path"
+                         HorizontalAlignment="Center"
+                         Height="35"
+                         FontFamily="Segoe Print"
+                         VerticalContentAlignment="Center"
+                         Text="\\192.168.2.3\shared\SeanWu\PB\"
+                         VerticalAlignment="Center"
+                         Width="430"
+                         Grid.ColumnSpan="2" />
+                <Button Name="btn_open_server"
+                        Width="35"
+                        Height="35"
                         VerticalAlignment="Center"
-                        ToolTip="Open Server Folder"
-                        HorizontalAlignment="Center" Click="btn_open_server_Click"/>
+                        ToolTip="Select Server Position"
+                        HorizontalAlignment="Center"
+                        Click="btn_open_server_Click"
+                        Background="#FFD4D4D4"
+                        Style="{DynamicResource ButtonStyle1}">
+                    <Image Source="Resources/folder.png"
+                           Visibility="Hidden" />
+                </Button>
             </StackPanel>
 
             <StackPanel Orientation="Horizontal"
@@ -151,8 +274,7 @@
                         Grid.ColumnSpan="2"
                         HorizontalAlignment="Center"
                         VerticalAlignment="Center">
-                <Label 
-                       Height="35"
+                <Label Height="35"
                        FontSize="14"
                        Content="Server :"
                        FontFamily="Segoe Print"
@@ -161,7 +283,7 @@
                        Grid.Column="1" />
                 <TextBox x:Name="txt_new_version"
                          HorizontalAlignment="Left"
-                         Height="35" 
+                         Height="35"
                          TextWrapping="Wrap"
                          FontFamily="Segoe Print"
                          VerticalContentAlignment="Center"
@@ -169,39 +291,44 @@
                          VerticalAlignment="Top"
                          Width="383"
                          Grid.Column="1"
-                         Visibility="Collapsed"
-                         />
+                         Visibility="Collapsed" />
                 <ComboBox Name="combox_latest_version"
                           Width="383"
                           FontFamily="Segoe Print"
-                          
                           VerticalContentAlignment="Center"
-                          HorizontalContentAlignment="Center" DropDownOpened="combox_latest_version_DropDownOpened"/>
+                          HorizontalContentAlignment="Center"
+                          DropDownOpened="combox_latest_version_DropDownOpened" />
             </StackPanel>
 
             <StackPanel Orientation="Horizontal"
                         Grid.Row="2"
                         Grid.ColumnSpan="2"
                         HorizontalAlignment="Center">
-            <TextBox x:Name="txt_local_path"
-                     HorizontalAlignment="Center"
-                     Height="35"
-                     FontFamily="Segoe Print"
-                     VerticalContentAlignment="Center"
-                     Text="\\192.168.2.3\shared\SeanWu\PB\"
-                     VerticalAlignment="Center"
-                     Width="430"
-                     Grid.ColumnSpan="2"
-                     Grid.Row="2" />
+                <TextBox x:Name="txt_local_path"
+                         HorizontalAlignment="Center"
+                         Height="35"
+                         FontFamily="Segoe Print"
+                         VerticalContentAlignment="Center"
+                         Text="\\192.168.2.3\shared\SeanWu\PB\"
+                         VerticalAlignment="Center"
+                         Width="430"
+                         Grid.ColumnSpan="2"
+                         Grid.Row="2" />
                 <Button Name="btn_open_local"
                         Width="35"
                         Height="35"
                         ToolTip="Open Local Folder"
                         VerticalAlignment="Center"
-                        HorizontalAlignment="Center" Click="btn_open_local_Click"/>
+                        HorizontalAlignment="Center"
+                        Click="btn_open_local_Click"
+                        Background="#FFD4D4D4"
+                        Style="{DynamicResource ButtonStyle1}">
+                    <Image Source="Resources/folder.png" Visibility="Hidden"/>
+                </Button>
             </StackPanel>
 
-            <StackPanel Grid.Row="3" Orientation="Horizontal"
+            <StackPanel Grid.Row="3"
+                        Orientation="Horizontal"
                         Grid.ColumnSpan="2"
                         HorizontalAlignment="Center"
                         VerticalAlignment="Center">
@@ -227,7 +354,8 @@
                           Width="383"
                           FontFamily="Segoe Print"
                           VerticalContentAlignment="Center"
-                          HorizontalContentAlignment="Center" DropDownOpened="combox_now_version_DropDownOpened"/>
+                          HorizontalContentAlignment="Center"
+                          DropDownOpened="combox_now_version_DropDownOpened" />
 
             </StackPanel>
 
@@ -254,15 +382,17 @@
                 <RowDefinition />
                 <RowDefinition />
             </Grid.RowDefinitions>
-            --><!--<Button x:Name="btn_checkVersion"
+            -->
+        <!--<Button x:Name="btn_checkVersion"
                     Content="Check Version"
                     Click="btn_checkVersion_Click"
                     Style="{DynamicResource style_FuncBtn}" />-->
-            <!--<Button x:Name="btn_checkAllVersion"
+        <!--<Button x:Name="btn_checkAllVersion"
                     Content="All Versions"
                     Click="btn_checkAllVersion_Click"
                     Grid.Row="1"
-                    Style="{DynamicResource style_FuncBtn}" />--><!--
+                    Style="{DynamicResource style_FuncBtn}" />-->
+        <!--
          
         </Grid>-->
 
@@ -272,10 +402,10 @@
                 <ColumnDefinition />
                 <ColumnDefinition />
             </Grid.ColumnDefinitions>
-            
 
-          
-           
+
+
+
 
             <!--<ScrollViewer Grid.Column="1"
                           Margin="10,90,10,10">
@@ -287,7 +417,7 @@
                            ScrollViewer.CanContentScroll="True"
                            VerticalAlignment="Top" />
             </ScrollViewer>-->
-            
+
             <!--<ScrollViewer Margin="10,90,10,10">
                 <TextBlock x:Name="txt_local_all_version"
                            HorizontalAlignment="Left"
@@ -298,7 +428,7 @@
                            VerticalAlignment="Top" />
             </ScrollViewer>-->
 
-            
+
         </Grid>
 
         <Grid Grid.Row="2"

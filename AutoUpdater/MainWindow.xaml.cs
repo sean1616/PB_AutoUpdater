@@ -13,7 +13,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Diagnostics;
-
+using Microsoft.WindowsAPICodePack.Dialogs;
 
 namespace AutoUpdater
 {
@@ -36,6 +36,7 @@ namespace AutoUpdater
 
         string path_exe = "";
         string path_now = "";
+        static string CurrentDirectory = Directory.GetCurrentDirectory();
         string ini_path = @"D:\PD\Instrument.ini";
         string auto_update_path = "";
 
@@ -51,6 +52,7 @@ namespace AutoUpdater
         {
             InitializeComponent();
 
+            ini_path = Path.Combine(CurrentDirectory, "Instrument.ini");
             fnc = new Functions(ini_path);
 
             #region Read ini
@@ -62,9 +64,8 @@ namespace AutoUpdater
 
             if (string.IsNullOrEmpty(auto_update_path))
             {
-                auto_update_path = @"\\192.168.2.3\shared\SeanWu\PB\";
+                auto_update_path = @"\\192.168.2.4\shared\SeanWu\PB\";
                 fnc.Ini_Write("Connection", "Auto_Update_Path", auto_update_path);
-
             }
             #endregion
 
@@ -594,7 +595,36 @@ namespace AutoUpdater
         {
             try
             {
-                System.Diagnostics.Process.Start(txt_server_path.Text);
+                //System.Diagnostics.Process.Start(txt_server_path.Text);
+
+                var dlg = new CommonOpenFileDialog();
+                dlg.Title = "Select Server Path";
+                dlg.IsFolderPicker = true;
+
+                string server_path = Directory.Exists(txt_server_path.Text) ? txt_server_path.Text : Directory.GetCurrentDirectory();
+                dlg.InitialDirectory = server_path;
+
+                dlg.DefaultDirectory = server_path;
+                dlg.AddToMostRecentlyUsedList = false;
+                dlg.AllowNonFileSystemItems = false;
+                dlg.EnsureFileExists = true;
+                dlg.EnsurePathExists = true;
+                dlg.EnsureReadOnly = false;
+                dlg.EnsureValidNames = true;
+                dlg.Multiselect = false;
+                dlg.ShowPlacesList = true;
+
+                if (dlg.ShowDialog() == CommonFileDialogResult.Ok)
+                {
+                    var folder = dlg.FileName;
+
+                    if (!string.IsNullOrEmpty(folder))
+                    {
+                        auto_update_path = folder;
+                        fnc.Ini_Write("Connection", "Auto_Update_Path", auto_update_path);
+                        txt_server_path.Text = auto_update_path;
+                    }
+                }               
             }
             catch { }
 
