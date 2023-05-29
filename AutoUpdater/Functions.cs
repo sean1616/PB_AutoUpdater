@@ -5,6 +5,8 @@ using System.Linq;
 using System.Text;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
+using IniParser;
+using IniParser.Model;
 
 namespace AutoUpdater
 {
@@ -19,9 +21,18 @@ namespace AutoUpdater
         List<string> list_all_path = new List<string>();
         List<int[]> all_version_level = new List<int[]>();
 
+        public FileIniDataParser parser = new FileIniDataParser();
+        public IniData data = new IniData();
+
         public Functions(string ini_path)
         {
             this.ini_path = ini_path;
+
+            //try
+            //{
+            //    data = parser.ReadFile(ini_path);
+            //}
+            //catch { }
         }
 
         public string Ini_Read(string Section, string key)
@@ -29,7 +40,8 @@ namespace AutoUpdater
             string _ini_read;
             if (File.Exists(ini_path))
             {
-                _ini_read = ini.IniReadValue(Section, key, ini_path);
+                //_ini_read = ini.IniReadValue(Section, key, ini_path);
+                _ini_read = data[Section][key];
             }
             else
                 _ini_read = "";
@@ -41,7 +53,11 @@ namespace AutoUpdater
         {
             if (!File.Exists(ini_path))
                 Directory.CreateDirectory(System.IO.Directory.GetParent(ini_path).ToString());  //建立資料夾
-            ini.IniWriteValue(Section, key, value, ini_path);  //創建ini file並寫入基本設定
+
+            data[Section][key] = value;
+            parser.WriteFile(ini_path, data);
+
+            //ini.IniWriteValue(Section, key, value, ini_path);  //創建ini file並寫入基本設定
         }
 
         public Dictionary<string, string> Get_All_Version_for_Show(List<string> allVersion, List<string> allVersion_path)
@@ -197,8 +213,16 @@ namespace AutoUpdater
                 foreach (string path in files_on_server)
                 {
                     string des_Filename = local_path +@"\"+ Path.GetFileName(path);
-                                        
-                    File.Copy(path, des_Filename, true);
+
+                    try
+                    {
+                        File.Copy(path, des_Filename, true);
+                    }
+                    catch
+                    {
+                        System.Windows.MessageBox.Show($"File [{path}] copy failed.");
+                        continue;
+                    }
                 }
             }
             catch

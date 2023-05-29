@@ -14,6 +14,8 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Diagnostics;
 using Microsoft.WindowsAPICodePack.Dialogs;
+using IniParser;
+using IniParser.Model;
 
 namespace AutoUpdater
 {
@@ -42,6 +44,8 @@ namespace AutoUpdater
 
         Functions fnc;
 
+
+
         List<string> all_version_for_show = new List<string>();
         Dictionary<string, string> dic_local_version = new Dictionary<string, string>();
         Dictionary<string, string> dic_server_version = new Dictionary<string, string>();
@@ -52,8 +56,19 @@ namespace AutoUpdater
         {
             InitializeComponent();
 
-            ini_path = Path.Combine(CurrentDirectory, "Instrument.ini");
+            ini_path = File.Exists(@"D:\PD\Instrument.ini") ? @"D:\PD\Instrument.ini" : Path.Combine(CurrentDirectory, "Instrument.ini");
+            //ini_path = Path.Combine(CurrentDirectory, "Instrument.ini");
+
             fnc = new Functions(ini_path);
+
+            try
+            {
+                fnc.data = fnc.parser.ReadFile(ini_path, Encoding.Unicode);
+            }
+            catch
+            {
+                MessageBox.Show($"Ini file parse failed");
+            }
 
             #region Read ini
             bool result = false;
@@ -61,103 +76,30 @@ namespace AutoUpdater
                 _isAutoUpdate = result;
 
             auto_update_path = fnc.Ini_Read("Connection", "Auto_Update_Path");
+            //auto_update_path = data["Connection"]["Auto_Update_Path"];
 
             if (string.IsNullOrEmpty(auto_update_path))
             {
-                auto_update_path = @"\\192.168.2.4\shared\SeanWu\PB\";
+                auto_update_path = @"\\192.168.2.4\OptiComm\tff\Data\SW\PB";
                 fnc.Ini_Write("Connection", "Auto_Update_Path", auto_update_path);
             }
             #endregion
 
             txt_server_path.Text = auto_update_path;
-            //txt_path.Text = @"\\192.168.2.3\shared\SeanWu\PB\";
             path_exe = txt_local_path.Text;
 
             path_now = Directory.GetCurrentDirectory();
             txt_local_path.Text = path_now;
-            //path_now = @"C:\Users\sean_wu\source\repos\AutoUpdater\AutoUpdater\bin\Debug";
-
 
             #region Check local version
 
-            combox_now_version.Items.Clear();
-            all_version_for_show.Clear();
+            Check_Local_Version();
 
-            allPaths = fnc.Get_all_PD_files(path_now);
-
-            List<List<string>> result_local = new List<List<string>>();
-
-            result_local = fnc.Analyze_all_PD_files(allPaths);
-
-            if (result_local.Count == 2)
-            {
-                list_local_all_path = new List<string>(result_local[0]);
-                list_local_all_version = new List<string>(result_local[1]);
-            }
-
-            dic_local_version = fnc.Get_All_Version_for_Show(list_local_all_version, list_local_all_path);
-            foreach (string s in dic_local_version.Keys)
-                combox_now_version.Items.Add(s);
-
-            txt_now_version.Text = fnc.Get_Lastest_Version(dic_local_version.Keys.ToList());
-
-            if (combox_now_version.Items.Contains(txt_now_version.Text)) combox_now_version.SelectedItem = txt_now_version.Text;
             #endregion
-
 
             #region Check server latest version
 
-            combox_latest_version.Items.Clear();
-            all_version_for_show.Clear();
-            dic_server_version.Clear();
-
-            if (!Directory.Exists(auto_update_path))
-            {
-                string msg = string.Concat
-                    ("Auto-Update folder is not exist",
-                     "\r\n",
-                     auto_update_path,
-                     "\r\n\r\n",
-                     "Please check ini setting",
-                     "\r\n",
-                      fnc.ini_path
-                    );
-                MessageBox.Show(msg);
-
-                return;
-            }
-
-            string[] ss = Directory.GetDirectories(auto_update_path, "v*");
-            for (int i = 0; i < ss.Length; i++)
-            {
-                string versionName = Path.GetFileName(ss[i].Replace("V", ""));
-                dic_server_version.Add(versionName, ss[i]);
-                combox_latest_version.Items.Add(versionName);
-            }
-
-            txt_new_version.Text = fnc.Get_Lastest_Version(dic_server_version.Keys.ToList());
-            if (combox_latest_version.Items.Contains(txt_new_version.Text)) combox_latest_version.SelectedItem = txt_new_version.Text;
-
-
-            //allPaths = fnc.Get_all_PD_files(auto_update_path);
-
-            //if (allPaths.Length == 0) label_msg.Content = "Path error";
-
-            //List<List<string>> result_server = new List<List<string>>();
-
-            //result_server = fnc.Analyze_all_PD_files(allPaths);
-
-            //if (result_server.Count == 2)
-            //{
-            //    list_server_all_path = new List<string>(result_server[0]);
-            //    list_server_all_version = new List<string>(result_server[1]);
-            //}
-
-            //dic_server_version = fnc.Get_All_Version_for_Show(list_server_all_version, list_server_all_path);
-
-
-            //txt_new_version.Text = fnc.Get_Lastest_Version(list_all_version);
-
+            Check_Latest_Version_from_Server();
 
             #endregion
 
@@ -231,6 +173,150 @@ namespace AutoUpdater
                 fnc.Open_Latest_Version(path_now, targetExe, target_version);
                 #endregion
             }
+        }
+
+        List<int[]> dic_server_version_arrayKey = new List<int[]>();
+
+        private void Check_Local_Version()
+        {
+            #region Check local version
+
+            combox_now_version.Items.Clear();
+            all_version_for_show.Clear();
+
+            allPaths = fnc.Get_all_PD_files(path_now);
+
+            List<List<string>> result_local = new List<List<string>>();
+
+            result_local = fnc.Analyze_all_PD_files(allPaths);
+
+            if (result_local.Count == 2)
+            {
+                list_local_all_path = new List<string>(result_local[0]);
+                list_local_all_version = new List<string>(result_local[1]);
+            }
+
+            dic_local_version = fnc.Get_All_Version_for_Show(list_local_all_version, list_local_all_path);
+
+            //foreach (string s in dic_local_version.Keys)
+            //    combox_now_version.Items.Add(s);
+
+            string[] sort_ver = dic_local_version.Keys.ToArray();
+            sort_ver = Bubble_Sort(sort_ver);
+
+            foreach (string s in sort_ver)
+                combox_now_version.Items.Add(s);
+
+            txt_now_version.Text = fnc.Get_Lastest_Version(dic_local_version.Keys.ToList());
+
+            if (combox_now_version.Items.Contains(txt_now_version.Text)) combox_now_version.SelectedItem = txt_now_version.Text;
+            #endregion
+
+        }
+
+        public bool CheckDirectoryExist(string dir_path)
+        {
+            if (Directory.Exists(dir_path))
+                return true;
+            else
+            {
+                MessageBox.Show($"Timeout\n{dir_path} is not exist");
+                return false;
+            }
+        }
+
+        private void Check_Latest_Version_from_Server()
+        {
+            #region Check server latest version
+
+            auto_update_path = txt_server_path.Text;
+
+            combox_latest_version.Items.Clear();
+            all_version_for_show.Clear();
+            dic_server_version.Clear();
+            dic_server_version_arrayKey.Clear();
+
+            var task = Task.Run(() => CheckDirectoryExist(auto_update_path));
+            var result = (task.Wait(1500)) ? task.Result : false;
+
+            if (!result)
+            {
+                string msg = string.Concat
+                    ("Auto-Update folder is not exist",
+                     "\r\n",
+                     auto_update_path,
+                     "\r\n\r\n",
+                     "Please check ini setting",
+                     "\r\n",
+                      fnc.ini_path
+                    );
+                MessageBox.Show(msg);
+
+                return;
+            }
+
+            string[] ss = Directory.GetDirectories(auto_update_path, "v*");
+            string[] sort_ver = new string[ss.Length];
+
+            for (int i = 0; i < ss.Length; i++)
+            {
+                string versionName = Path.GetFileName(ss[i].Replace("V", ""));
+                dic_server_version.Add(versionName, ss[i]);
+
+                sort_ver[i] = versionName;
+            }
+
+            //Bubble sort
+            sort_ver = Bubble_Sort(sort_ver);
+
+
+            //add items into combobox (in order)
+            foreach (string s in sort_ver)
+            {
+                combox_latest_version.Items.Add(s); //Add version string to combobox
+            }
+
+            txt_new_version.Text = fnc.Get_Lastest_Version(dic_server_version.Keys.ToList());
+            if (combox_latest_version.Items.Contains(txt_new_version.Text)) combox_latest_version.SelectedItem = txt_new_version.Text;
+
+            #endregion
+        }
+
+        private string[] Bubble_Sort(string[] sort_ver)
+        {
+            string[] sort_result = new string[sort_ver.Length];
+            sort_ver.CopyTo(sort_result, 0);
+
+            //Bubble sort
+            for (int i = 0; i < sort_result.Length; i++)
+            {
+                for (int j = 1; j < sort_result.Length - i; j++)
+                {
+                    var ver1 = new Version(sort_result[j - 1]);
+                    var ver2 = new Version(sort_result[j]);
+                    Console.WriteLine(sort_result[j - 1]);
+                    Console.WriteLine(sort_result[j]);
+
+                    //比較版本新/舊
+                    var result = ver2.CompareTo(ver1);
+
+                    if (result > 0)
+                        Console.WriteLine("version2 is greater");
+                    else if (result < 0)
+                    {
+                        Console.WriteLine("version1 is greater");
+
+                        //exchange items
+                        string temp_string = sort_result[j];
+                        sort_result[j] = sort_result[j - 1];
+                        sort_result[j - 1] = temp_string;
+                    }
+                    else
+                        Console.WriteLine("versions are equal");
+                }
+            }
+
+            return sort_result;
         }
 
         private void border_title_MouseLeftButtonUp(object sender, System.Windows.Input.MouseButtonEventArgs e)
@@ -336,24 +422,20 @@ namespace AutoUpdater
 
             txt_new_version.Text = fnc.Get_Lastest_Version(list_server_all_version);
             #endregion
-
-            //txt_local_all_version.Text = "";
-            //foreach(string s in list_local_all_path)
-            //{
-            //    txt_local_all_version.Text += (s + "\r");
-            //}
-
-            //txt_server_all_version.Text = "";
-            //foreach(string s in list_server_all_path)
-            //{
-            //    txt_server_all_version.Text += (s + "\r");
-            //}
         }
 
         string targetExe = "";
         private void btn_update_Click(object sender, RoutedEventArgs e)
         {
-            #region Copy_Server_Version
+            #region Copy_Check_version_from_Server
+
+            Check_Latest_Version_from_Server();
+
+            if (dic_server_version.Count == 0)
+            {
+                MessageBox.Show("Not found in Server");
+                return;
+            }
 
             string server_path = dic_server_version[combox_latest_version.SelectedItem.ToString()];
             if (fnc.Get_Files_from_Server(server_path, txt_local_path.Text))
@@ -384,6 +466,9 @@ namespace AutoUpdater
                 if (combox_now_version.Items.Contains(txt_now_version.Text)) combox_now_version.SelectedItem = txt_now_version.Text;
                 #endregion
 
+                auto_update_path = txt_server_path.Text;
+                fnc.Ini_Write("Connection", "Auto_Update_Path", auto_update_path);
+
                 MessageBox.Show("Updated");
             }
 
@@ -394,132 +479,30 @@ namespace AutoUpdater
         {
             try
             {
-                System.Diagnostics.Process.Start(dic_local_version[combox_now_version.SelectedItem.ToString()]);
-                this.Close();
+                //System.Diagnostics.Process.Start(dic_local_version[combox_now_version.SelectedItem.ToString()]);
+
+                if (File.Exists(Path.Combine(CurrentDirectory, "Window_Select_Station.exe")))
+                {
+                    string para = dic_local_version[combox_now_version.SelectedItem.ToString()];
+                    System.Diagnostics.Process.Start
+                        (Path.Combine(CurrentDirectory, "Window_Select_Station.exe"),
+                        para);
+                    this.Close();
+                }
+                else
+                {
+                    MessageBox.Show($"路徑不存在:{Path.Combine(CurrentDirectory, "Window_Select_Station.exe")}");
+
+                    if (File.Exists(dic_local_version[combox_now_version.SelectedItem.ToString()]))
+                    {
+                        System.Diagnostics.Process.Start(dic_local_version[combox_now_version.SelectedItem.ToString()]);
+
+                        this.Close();
+                    }
+                }
             }
             catch { }
         }
-
-        //private void Get_all_PD_files(string pathDirectory)
-        //{            
-        //    list_all_version.Clear();
-        //    list_all_path.Clear();
-
-        //    string[] filePaths = Directory.GetFiles(pathDirectory);
-
-        //    Analyze_all_PD_files(filePaths);           
-        //}
-
-        //private void Analyze_all_PD_files(string[] all_filePaths)
-        //{
-        //    string allfiles = "";
-
-        //    foreach (string s in all_filePaths)
-        //    {
-        //        string exeName = Path.GetFileName(s);
-        //        string exeName_without_extension = Path.GetFileNameWithoutExtension(s);
-
-        //        if (!string.IsNullOrEmpty(exeName))
-        //        {
-        //            string[] exeName_detail = exeName.Split('v');
-        //            string[] exeName_detail_without_extension = exeName_without_extension.Split('v');
-
-        //            if (exeName_detail.Length > 1)
-        //            {
-        //                if (exeName_detail[0] == "PD-")
-        //                {
-        //                    allfiles = allfiles + "\r" + s;
-
-        //                    list_all_path.Add(s);
-
-        //                    if (!list_all_version.Contains(exeName_detail[1]))   //含有版別資訊的檔案
-        //                        list_all_version.Add(exeName_detail[1]);
-        //                }
-
-        //            }
-        //        }
-
-        //    }
-        //    txt_server_all_version.Text = allfiles;
-        //}
-
-        //private void Check_Version()
-        //{
-        //    path_now = Directory.GetCurrentDirectory();
-
-        //    string fllename_now = Process.GetCurrentProcess().MainModule.FileName;
-
-        //    fllename_now = Path.GetFileNameWithoutExtension(fllename_now);
-        //    txt_now_version.Text = fllename_now;
-
-        //    if (list_all_version.Count == 0)
-        //    {
-        //        Get_all_PD_files(path_exe);
-        //    }
-
-        //    #region Judge latest version
-        //    int Level_1 = 0;
-        //    int Level_2 = 0;
-        //    int Level_3 = 0;
-
-        //    all_version_level.Clear();
-        //    foreach (string ss in list_all_version)
-        //    {
-        //        int[] version_level = new int[3];
-        //        string[] version_detail = ss.Split('.');
-
-        //        int result;
-        //        if (int.TryParse(version_detail[0], out result))
-        //            version_level[0] = result;
-
-        //        if (int.TryParse(version_detail[1], out result))
-        //            version_level[1] = result;
-
-        //        if (int.TryParse(version_detail[2], out result))
-        //            version_level[2] = result;
-
-        //        //Level 1:
-        //        if (version_level[0] > Level_1)
-        //        {
-        //            //Level 1:
-        //            Level_1 = version_level[0];
-
-        //            //Level 2:
-        //            Level_2 = version_level[1];
-
-        //            //Level 3:
-        //            Level_3 = version_level[2];
-        //        }
-        //        else if (version_level[1] > Level_2)
-        //        {
-        //            if (version_level[0] >= Level_1)
-        //            {
-        //                //Level 2:
-        //                Level_2 = version_level[1];
-
-        //                //Level 3:
-        //                Level_3 = version_level[2];
-        //            }
-        //        }
-        //        else if (version_level[2] > Level_3)
-        //        {
-        //            if (version_level[1] >= Level_2)
-        //            {
-        //                if (version_level[0] >= Level_1)
-        //                {
-        //                    //Level 3:
-        //                    Level_3 = version_level[2];
-        //                }
-        //            }
-        //        }
-
-        //        string new_version = string.Concat(Level_1, ".", Level_2, ".", Level_3);
-        //        txt_new_version.Text = new_version;
-
-        //        all_version_level.Add(version_level);
-        //    }
-        //    #endregion
-        //}
 
         private void Open_Latest_Version()
         {
@@ -550,8 +533,6 @@ namespace AutoUpdater
                     }
                 }
             }
-
-            //txt_server_all_version.Text = updateFile;
 
             string targetPath = Path.Combine(path_now, targetExe);
             if (File.Exists(targetPath))
@@ -595,13 +576,14 @@ namespace AutoUpdater
         {
             try
             {
-                //System.Diagnostics.Process.Start(txt_server_path.Text);
-
                 var dlg = new CommonOpenFileDialog();
                 dlg.Title = "Select Server Path";
                 dlg.IsFolderPicker = true;
 
-                string server_path = Directory.Exists(txt_server_path.Text) ? txt_server_path.Text : Directory.GetCurrentDirectory();
+                var task = Task.Run(() => CheckDirectoryExist(txt_server_path.Text));
+                var result = (task.Wait(1500)) ? task.Result : false;
+
+                string server_path = result ? txt_server_path.Text : Directory.GetCurrentDirectory();
                 dlg.InitialDirectory = server_path;
 
                 dlg.DefaultDirectory = server_path;
@@ -624,10 +606,9 @@ namespace AutoUpdater
                         fnc.Ini_Write("Connection", "Auto_Update_Path", auto_update_path);
                         txt_server_path.Text = auto_update_path;
                     }
-                }               
+                }
             }
             catch { }
-
         }
 
         private void btn_open_local_Click(object sender, RoutedEventArgs e)
@@ -641,55 +622,52 @@ namespace AutoUpdater
 
         private void combox_latest_version_DropDownOpened(object sender, EventArgs e)
         {
-            #region Check server latest version
+            Check_Latest_Version_from_Server();
 
-            combox_latest_version.Items.Clear();
-            all_version_for_show.Clear();
-            dic_server_version.Clear();
-            string[] ss = Directory.GetDirectories(auto_update_path, "v*");
-            for (int i = 0; i < ss.Length; i++)
-            {
-                string versionName = Path.GetFileName(ss[i].Replace("V", ""));
-                dic_server_version.Add(versionName, ss[i]);
-                combox_latest_version.Items.Add(versionName);
-            }
+            //combox_latest_version.Items.Clear();
+            //all_version_for_show.Clear();
+            //dic_server_version.Clear();
+            //string[] ss = Directory.GetDirectories(auto_update_path, "v*");
+            //for (int i = 0; i < ss.Length; i++)
+            //{
+            //    string versionName = Path.GetFileName(ss[i].Replace("V", ""));
+            //    dic_server_version.Add(versionName, ss[i]);
+            //    combox_latest_version.Items.Add(versionName);
+            //}
 
-            txt_new_version.Text = fnc.Get_Lastest_Version(dic_server_version.Keys.ToList());
-            if (combox_latest_version.Items.Contains(txt_new_version.Text)) combox_latest_version.SelectedItem = txt_new_version.Text;
-            
-            #endregion
 
+            //txt_new_version.Text = fnc.Get_Lastest_Version(dic_server_version.Keys.ToList());
+            //if (combox_latest_version.Items.Contains(txt_new_version.Text)) combox_latest_version.SelectedItem = txt_new_version.Text;
         }
 
         private void combox_now_version_DropDownOpened(object sender, EventArgs e)
         {
-            #region Check local version
+            Check_Local_Version();
+            //#region Check local version
 
-            combox_now_version.Items.Clear();
-            all_version_for_show.Clear();
+            //combox_now_version.Items.Clear();
+            //all_version_for_show.Clear();
 
-            allPaths = fnc.Get_all_PD_files(path_now);
+            //allPaths = fnc.Get_all_PD_files(path_now);
 
-            List<List<string>> result_local = new List<List<string>>();
+            //List<List<string>> result_local = new List<List<string>>();
 
-            result_local = fnc.Analyze_all_PD_files(allPaths);
+            //result_local = fnc.Analyze_all_PD_files(allPaths);
 
-            if (result_local.Count == 2)
-            {
-                list_local_all_path = new List<string>(result_local[0]);
-                list_local_all_version = new List<string>(result_local[1]);
-            }
+            //if (result_local.Count == 2)
+            //{
+            //    list_local_all_path = new List<string>(result_local[0]);
+            //    list_local_all_version = new List<string>(result_local[1]);
+            //}
 
-            dic_local_version = fnc.Get_All_Version_for_Show(list_local_all_version, list_local_all_path);
-            foreach (string s in dic_local_version.Keys)
-                combox_now_version.Items.Add(s);
+            //dic_local_version = fnc.Get_All_Version_for_Show(list_local_all_version, list_local_all_path);
+            //foreach (string s in dic_local_version.Keys)
+            //    combox_now_version.Items.Add(s);
 
-            txt_now_version.Text = fnc.Get_Lastest_Version(dic_local_version.Keys.ToList());
+            //txt_now_version.Text = fnc.Get_Lastest_Version(dic_local_version.Keys.ToList());
 
-            if (combox_now_version.Items.Contains(txt_now_version.Text)) combox_now_version.SelectedItem = txt_now_version.Text;
-            #endregion
+            //if (combox_now_version.Items.Contains(txt_now_version.Text)) combox_now_version.SelectedItem = txt_now_version.Text;
+            //#endregion
         }
-
-
     }
 }

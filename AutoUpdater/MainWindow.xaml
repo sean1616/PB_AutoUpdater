@@ -6,10 +6,15 @@
         xmlns:local="clr-namespace:AutoUpdater"
         mc:Ignorable="d"
         WindowStyle="None"
+        Style="{DynamicResource style_window}"
+        AllowsTransparency="True"
         Title="AutoUpdater"
         Height="450"
         Width="800">
     <Window.Resources>
+        <Style x:Key="style_window" TargetType="{x:Type Window}">
+            <Setter Property="FontFamily" Value="Segoe Print" />
+        </Style>
         <Style x:Key="FocusVisual">
             <Setter Property="Control.Template">
                 <Setter.Value>
@@ -124,8 +129,6 @@
         </Style>
     </Window.Resources>
 
-
-
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="40" />
@@ -176,23 +179,14 @@
                           MaxWidth="50"
                           MinWidth="40"
                           MaxHeight="25"
-                          ToolTip="Auto Update"
                           Click="ToggleBtn_Auto_Update_Click"
                           IsChecked="{Binding isDACorVolt, Mode=TwoWay}"
                           Style="{StaticResource SwitchTypeToggleButton_In_SettingPage}">
-                <ToggleButton.Background>
-                    <LinearGradientBrush StartPoint="0,0"
-                                         EndPoint="0,1">
-                        <GradientStop Offset="0"
-                                      Color="#FFF3F3F3" />
-                        <GradientStop Offset="0.5"
-                                      Color="#FFEBEBEB" />
-                        <GradientStop Offset="0.5"
-                                      Color="#FFDDDDDD" />
-                        <GradientStop Offset="1"
-                                      Color="#FF33D3C4" />
-                    </LinearGradientBrush>
-                </ToggleButton.Background>
+                <ToggleButton.ToolTip>
+                    <ToolTip>
+                        <TextBlock Text="Auto Update" FontFamily="Segoe print"/>
+                    </ToolTip>
+                </ToggleButton.ToolTip>
             </ToggleButton>
 
             <Button Name="btn_min"
@@ -251,7 +245,7 @@
                          Height="35"
                          FontFamily="Segoe Print"
                          VerticalContentAlignment="Center"
-                         Text="\\192.168.2.3\shared\SeanWu\PB\"
+                         Text="\\192.168.2.4\OptiComm\tff\Data\SW\PB"
                          VerticalAlignment="Center"
                          Width="430"
                          Grid.ColumnSpan="2" />
