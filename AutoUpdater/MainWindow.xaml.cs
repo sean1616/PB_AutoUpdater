@@ -481,23 +481,36 @@ namespace AutoUpdater
             {
                 //System.Diagnostics.Process.Start(dic_local_version[combox_now_version.SelectedItem.ToString()]);
 
-                if (File.Exists(Path.Combine(CurrentDirectory, "Window_Select_Station.exe")))
+                string str = fnc.Ini_Read("Connection", "SkipSelectStation");
+                bool SkipSelectStation = bool.TryParse(str, out bool rst) ? rst : false;
+
+                if (SkipSelectStation)  //跳過選擇站台視窗
                 {
-                    string para = dic_local_version[combox_now_version.SelectedItem.ToString()];
-                    System.Diagnostics.Process.Start
-                        (Path.Combine(CurrentDirectory, "Window_Select_Station.exe"),
-                        para);
-                    this.Close();
+                    if (File.Exists(dic_local_version[combox_now_version.SelectedItem.ToString()]))
+                    {
+                        //開啟北極熊
+                        Process.Start(dic_local_version[combox_now_version.SelectedItem.ToString()]);
+                        this.Close();
+                    }
                 }
                 else
                 {
-                    MessageBox.Show($"路徑不存在:{Path.Combine(CurrentDirectory, "Window_Select_Station.exe")}");
-
-                    if (File.Exists(dic_local_version[combox_now_version.SelectedItem.ToString()]))
+                    if (File.Exists(Path.Combine(CurrentDirectory, "Window_Select_Station.exe")))
                     {
-                        System.Diagnostics.Process.Start(dic_local_version[combox_now_version.SelectedItem.ToString()]);
-
+                        string para = dic_local_version[combox_now_version.SelectedItem.ToString()];
+                        Process.Start(Path.Combine(CurrentDirectory, "Window_Select_Station.exe"), para);
                         this.Close();
+                    }
+                    else
+                    {
+                        MessageBox.Show($"路徑不存在:{Path.Combine(CurrentDirectory, "Window_Select_Station.exe")}");
+
+                        if (File.Exists(dic_local_version[combox_now_version.SelectedItem.ToString()]))
+                        {
+                            //開啟北極熊
+                            Process.Start(dic_local_version[combox_now_version.SelectedItem.ToString()]);
+                            this.Close();
+                        }
                     }
                 }
             }
@@ -579,8 +592,8 @@ namespace AutoUpdater
                 var dlg = new CommonOpenFileDialog();
                 dlg.Title = "Select Server Path";
                 dlg.IsFolderPicker = true;
-
-                var task = Task.Run(() => CheckDirectoryExist(txt_server_path.Text));
+                string str_server_path = txt_server_path.Text;
+                var task = Task.Run(() => CheckDirectoryExist(str_server_path));
                 var result = (task.Wait(1500)) ? task.Result : false;
 
                 string server_path = result ? txt_server_path.Text : Directory.GetCurrentDirectory();

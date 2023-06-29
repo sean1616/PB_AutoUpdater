@@ -5,8 +5,6 @@ VisualStudioVersion = 17.2.32526.322
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AutoUpdater", "AutoUpdater\AutoUpdater.csproj", "{2BC728CB-E416-48E0-8E4C-9158D5380441}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Window_Select_Station", "C:\Users\sean_wu\source\repos\Window_Select_Station\Window_Select_Station\Window_Select_Station.csproj", "{7B5E6624-E3EE-4937-B948-52433B27A702}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -17,10 +15,6 @@ Global
 		{2BC728CB-E416-48E0-8E4C-9158D5380441}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2BC728CB-E416-48E0-8E4C-9158D5380441}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2BC728CB-E416-48E0-8E4C-9158D5380441}.Release|Any CPU.Build.0 = Release|Any CPU
-		{7B5E6624-E3EE-4937-B948-52433B27A702}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{7B5E6624-E3EE-4937-B948-52433B27A702}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{7B5E6624-E3EE-4937-B948-52433B27A702}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{7B5E6624-E3EE-4937-B948-52433B27A702}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

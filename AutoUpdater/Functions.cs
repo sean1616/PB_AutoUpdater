@@ -220,7 +220,7 @@ namespace AutoUpdater
                     }
                     catch
                     {
-                        System.Windows.MessageBox.Show($"File [{path}] copy failed.");
+                        System.Windows.MessageBox.Show($"Copy file [{path}] failed.");
                         continue;
                     }
                 }
